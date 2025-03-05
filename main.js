@@ -222,11 +222,17 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 class Enemy extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, texture = 'enemy') {
     super(scene, x, y, texture);
-    this.scene = scene;
+    // Add to display list and physics world
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
+
     this.speed = 100;
     this.setCollideWorldBounds(true);
   }
-  update(player) {}
+  
+  update(player) {
+    // Base enemy does nothing – override in subclasses.
+  }
 }
 
 // PatrolEnemy
