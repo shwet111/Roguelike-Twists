@@ -5,16 +5,18 @@ class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    // Load assets – replace with your own asset paths.
-    this.load.image('tiles', 'assets/tiles.png'); // Tileset image for the level.
+    // Load images – replace with your own asset paths.
+    this.load.image('tiles', 'assets/tiles.png'); // Tileset image
     this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('enemy', 'assets/enemy.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.audio('bgm', 'assets/chiptune.mp3');
+
+    // ~~Audio Removed~~
+    // this.load.audio('bgm', 'assets/chiptune.mp3');
   }
 
   create() {
-    // Play background music
-    this.sound.add('bgm', { volume: 0.5, loop: true }).play();
+    // ~~Remove background music lines~~
+    // this.sound.add('bgm', { volume: 0.5, loop: true }).play();
 
     // Create a procedural level using preset segments
     this.createProceduralLevel();
@@ -41,7 +43,8 @@ class MainScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // Display narrative text (simple backstory)
-    this.add.text(20, 20, "Once a celebrated hero, our protagonist ventures into a cursed dungeon to reclaim a lost relic.", { font: "16px Arial", fill: "#ffffff" })
+    this.add.text(20, 20, "Once a celebrated hero, our protagonist ventures into a cursed dungeon to reclaim a lost relic.", 
+    { font: "16px Arial", fill: "#ffffff" })
       .setScrollFactor(0);
   }
 
@@ -49,25 +52,23 @@ class MainScene extends Phaser.Scene {
     // Update player controller with input
     this.player.update(this.cursors);
 
-    // Update each enemy based on the player's current position
+    // Update each enemy
     this.enemies.children.iterate(enemy => {
       enemy.update(this.player);
     });
 
-    // Check for level completion (player reaches end of level)
+    // Check for level completion
     if (this.player.x > this.levelWidth - 50) {
       console.log("Level Complete! New ability unlocked: Double Jump");
-      // Transition to next level or apply progression logic.
+      // Transition to next level or apply progression logic
     }
   }
 
   createProceduralLevel() {
-    // Define level dimensions in tiles
-    const mapWidth = 50; // 50 tiles wide
-    const mapHeight = 20; // 20 tiles high
+    const mapWidth = 50; 
+    const mapHeight = 20;
     this.levelWidth = mapWidth * 32;
 
-    // Create a blank tilemap
     const map = this.make.tilemap({ width: mapWidth, height: mapHeight, tileWidth: 32, tileHeight: 32 });
     const tileset = map.addTilesetImage('tiles');
     this.groundLayer = map.createBlankLayer("Ground", tileset, 0, 0);
@@ -77,21 +78,21 @@ class MainScene extends Phaser.Scene {
       map.putTileAt(1, x, mapHeight - 1, true, this.groundLayer);
     }
 
-    // Define preset segments (each segment is 10 tiles wide)
+    // Define preset segments
     const segments = [
-      { // Segment A: flat ground with two platforms
+      {
         platforms: [
           { x: 2, y: 15, width: 4 },
           { x: 6, y: 12, width: 3 }
         ]
       },
-      { // Segment B: uneven ground with one long platform
+      {
         platforms: [
           { x: 0, y: 17, width: 10 },
           { x: 4, y: 14, width: 3 }
         ]
       },
-      { // Segment C: gap and a higher platform
+      {
         platforms: [
           { x: 0, y: 17, width: 4 },
           { x: 6, y: 13, width: 4 }
@@ -99,7 +100,6 @@ class MainScene extends Phaser.Scene {
       }
     ];
 
-    // Use segments to fill the level horizontally
     const segmentWidth = 10;
     const numSegments = Math.floor(mapWidth / segmentWidth);
     for (let seg = 0; seg < numSegments; seg++) {
@@ -113,26 +113,22 @@ class MainScene extends Phaser.Scene {
         });
       }
     }
-    // Enable collision on ground tile (index 1)
     this.groundLayer.setCollision(1);
   }
 
   createEnemies() {
-    // Spawn one enemy per segment at random positions within each segment
-    const segmentPixelWidth = 10 * 32; // each segment is 10 tiles wide at 32px per tile
+    const segmentPixelWidth = 10 * 32;
     const numSegments = Math.floor(this.levelWidth / segmentPixelWidth);
     for (let seg = 0; seg < numSegments; seg++) {
-      // Randomly choose an enemy type: patrol, jumping, or chasing
       const enemyType = Phaser.Utils.Array.GetRandom(['patrol', 'jumping', 'chasing']);
       const x = seg * segmentPixelWidth + Phaser.Math.Between(50, segmentPixelWidth - 50);
-      // Place enemy slightly above ground level (assuming ground is near the bottom)
       const y = (20 - 2) * 32;
       let enemy;
       if (enemyType === 'patrol') {
         enemy = new PatrolEnemy(this, x, y);
       } else if (enemyType === 'jumping') {
         enemy = new JumpingEnemy(this, x, y);
-      } else if (enemyType === 'chasing') {
+      } else {
         enemy = new ChasingEnemy(this, x, y);
       }
       this.enemies.add(enemy);
@@ -145,18 +141,18 @@ class MainScene extends Phaser.Scene {
   }
 }
 
-// Player class: handles movement, jumping, crouching, and basic progression logic.
+// Player class
 class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, 'player');
     this.speed = 200;
     this.jumpSpeed = -350;
     this.isCrouching = false;
-    this.hasDoubleJump = false; // unlocked upon level completion
+    this.hasDoubleJump = false;
     this.canDoubleJump = false;
     this.health = 3;
 
-    // Create animations (using frames from the spritesheet)
+    // Animations
     if (!scene.anims.exists('walk')) {
       scene.anims.create({
         key: 'walk',
@@ -175,7 +171,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     if (!scene.anims.exists('crouch')) {
       scene.anims.create({
         key: 'crouch',
-        frames: [{ key: 'player', frame: 4 }], // assume frame 4 is a crouch frame
+        frames: [{ key: 'player', frame: 4 }], 
         frameRate: 10
       });
     }
@@ -196,10 +192,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       this.anims.play(this.isCrouching ? 'crouch' : 'idle', true);
     }
 
-    // Crouching: when down arrow is held
+    // Crouching
     this.isCrouching = cursors.down.isDown;
 
-    // Jumping: support normal jump and double jump (if unlocked)
+    // Jumping
     if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
       if (this.body.onFloor()) {
         this.setVelocityY(this.jumpSpeed);
@@ -215,10 +211,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.health--;
     console.log("Player health:", this.health);
     if (this.health <= 0) {
-      // Restart level on death
       this.scene.scene.restart();
     } else {
-      // Reset position as a damage penalty
       this.setPosition(100, 400);
     }
   }
@@ -232,13 +226,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.speed = 100;
     this.setCollideWorldBounds(true);
   }
-  
-  update(player) {
-    // Base enemy does nothing – to be overridden by subclasses.
-  }
+  update(player) {}
 }
 
-// PatrolEnemy: moves back and forth within a set range.
+// PatrolEnemy
 class PatrolEnemy extends Enemy {
   constructor(scene, x, y) {
     super(scene, x, y);
@@ -247,7 +238,6 @@ class PatrolEnemy extends Enemy {
     this.patrolRange = 100;
     this.startX = x;
   }
-  
   update(player) {
     if (this.x < this.startX - this.patrolRange) {
       this.direction = 1;
@@ -261,14 +251,13 @@ class PatrolEnemy extends Enemy {
   }
 }
 
-// JumpingEnemy: periodically jumps when on the ground.
+// JumpingEnemy
 class JumpingEnemy extends Enemy {
   constructor(scene, x, y) {
     super(scene, x, y);
     this.jumpTimer = 0;
-    this.jumpInterval = Phaser.Math.Between(2000, 4000); // in milliseconds
+    this.jumpInterval = Phaser.Math.Between(2000, 4000);
   }
-  
   update(player) {
     this.jumpTimer += this.scene.game.loop.delta;
     if (this.jumpTimer > this.jumpInterval && this.body.onFloor()) {
@@ -278,13 +267,12 @@ class JumpingEnemy extends Enemy {
   }
 }
 
-// ChasingEnemy: chases the player if within a certain range.
+// ChasingEnemy
 class ChasingEnemy extends Enemy {
   constructor(scene, x, y) {
     super(scene, x, y);
     this.chaseRange = 150;
   }
-  
   update(player) {
     const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
     if (distance < this.chaseRange) {
@@ -301,7 +289,7 @@ class ChasingEnemy extends Enemy {
   }
 }
 
-// Game configuration and initialization
+// Game configuration
 const config = {
   type: Phaser.AUTO,
   width: 800,
