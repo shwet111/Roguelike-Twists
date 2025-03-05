@@ -26,3 +26,16 @@ header {
   background: #000;
   margin: 20px 0;
 }
+
+#uiOverlay {
+  position: fixed;
+  top: 80px;  /* Adjust as needed */
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 100; /* Ensure it stays on top */
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+}
+
