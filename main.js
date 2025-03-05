@@ -145,8 +145,8 @@ class MainScene extends Phaser.Scene {
 class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, 'player');
-    this.speed = 200;
-    this.jumpSpeed = -350;
+    this.speed = 220;
+    this.jumpSpeed = -400;
     this.isCrouching = false;
     this.hasDoubleJump = false;
     this.canDoubleJump = false;
